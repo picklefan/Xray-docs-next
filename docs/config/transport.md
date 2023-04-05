@@ -278,6 +278,7 @@ CipherSuites 用于配置受支持的密码套件列表, 每个套件名称之�
   "maxClientVer": "",
   "maxTimeDiff": 0,
   "shortIds": ["", "0123456789abcdef"],
+  "shortId": "",
   "fingerprint": "chrome",
   "serverName": "",
   "publicKey": "",
@@ -294,67 +295,35 @@ CipherSuites 用于配置受支持的密码套件列表, 每个套件名称之�
 
 当值为 `true` 时，输出调试信息。
 
-> `dest` : string
-
 ::: tip
-**只需**在**入站**（**服务端**）配置。
+以下为**入站**（**服务端**）配置。
 :::
+
+> `dest` : string
 
 必填，格式同 VLESS `fallbacks` 的 [dest](https://xtls.github.io/config/features/fallback.html#fallbackobject)。
 
 > `xver` : number
 
-::: tip
-**只需**在**入站**（**服务端**）配置。
-:::
-
 选填，格式同 VLESS `fallbacks` 的 [xver](https://xtls.github.io/config/features/fallback.html#fallbackobject)
 
 > `serverNames` : \[string\]
 
-::: tip
-**只需**在**入站**（**服务端**）配置。
-:::
-
 必填，客户端可用的 `serverName` 列表，暂不支持 \* 通配符。
 
-> `serverName` : string
-
-::: tip
-**只需**在**出站**（**客户端**）配置。
-:::
-
-服务端 serverNames 之一。
-
 > `privateKey` : string
-
-::: tip
-**只需**在**入站**（**服务端**）配置。
-:::
 
 必填，执行 `./xray x25519` 生成。
 
 > `minClientVer` : string
 
-::: tip
-**只需**在**入站**（**服务端**）配置。
-:::
-
 选填，客户端 Xray 最低版本，格式为 `x.y.z`。
 
 > `maxClientVer` : string
 
-::: tip
-**只需**在**入站**（**服务端**）配置。
-:::
-
 选填，客户端 Xray 最高版本，格式为 `x.y.z`。
 
 > `maxTimeDiff` : number
-
-::: tip
-**只需**在**入站**（**服务端**）配置。
-:::
 
 选填，允许的最大时间差，单位为毫秒。
 
@@ -366,27 +335,31 @@ CipherSuites 用于配置受支持的密码套件列表, 每个套件名称之�
 
 若包含空值，客户端 `shortId` 可为空。
 
-> `fingerprint` : string
-
 ::: tip
-**只需**在**出站**（**客户端**）配置。
+以下为**出站**（**客户端**）配置。
 :::
+
+> `serverName` : string
+
+服务端 serverNames 之一。
+
+> `fingerprint` : string
 
 必填，同 [TLSObject](https://xtls.github.io/config/transport.html#tlsobject)。
 
-> `publicKey` : string
+> `shortID` : string
 
-::: tip
-**只需**在**出站**（**客户端**）配置。
-:::
+服务端 shortIds 之一。
+
+0 到 f，长度为 2 的倍数，长度上限为 16。
+
+若服务端的 `shordIDs` 包含空值，客户端可为空。
+
+> `publicKey` : string
 
 必填，服务端私钥对应的公钥。使用 `./xray x25519 -i "服务器私钥"` 生成。
 
 > `spiderX` : string
-
-::: tip
-**只需**在**出站**（**客户端**）配置。
-:::
 
 爬虫初始路径与参数，建议每个客户端不同。
 
@@ -521,6 +494,7 @@ OCSP 装订更新，与证书热重载的时间间隔。 单位：秒。默认�
   "dialerProxy": "",
   "acceptProxyProtocol": false,
   "tcpKeepAliveInterval": 0,
+  "tcpKeepAliveIdle": 300,
   "tcpcongestion": "bbr",
   "interface": "wg0"
 }
@@ -635,6 +609,20 @@ OCSP 装订更新，与证书热重载的时间间隔。 单位：秒。默认�
 > `tcpKeepAliveInterval`: number
 
 TCP 保持活跃的数据包发送间隔，单位为秒。~~该设置仅适用于 Linux 下。~~
+
+它是连接不正常（未收到 ack）时候的心跳包。
+
+不配置此项或配置为 0 表示使用 Go 默认值。
+
+::: tip
+填负数时，如 `-1`，不启用 TCP 保持活跃。
+:::
+
+> `tcpKeepAliveIdle`: number
+
+TCP 空闲时间阈值，单位为秒。当 TCP 连接空闲时间达到这个阈值时，将开始发送 Keep-Alive 探测包。
+
+它是连接正常时候的心跳包。
 
 不配置此项或配置为 0 表示使用 Go 默认值。
 
